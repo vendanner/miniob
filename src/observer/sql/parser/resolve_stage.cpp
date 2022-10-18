@@ -83,6 +83,11 @@ void ResolveStage::cleanup()
   LOG_TRACE("Exit");
 }
 
+/**
+ * resolve 在create_stmt 时，会对表/字段做校验
+ *
+ * @param event
+ */
 void ResolveStage::handle_event(StageEvent *event)
 {
   LOG_TRACE("Enter\n");
