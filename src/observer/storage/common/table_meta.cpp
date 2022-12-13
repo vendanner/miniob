@@ -51,6 +51,46 @@ RC TableMeta::init_sys_fields()
   sys_fields_.push_back(field_meta);
   return rc;
 }
+/**
+ * 组装表元信息
+ *  1. 新增__trx 内部字段-sys_fields_
+ *  2. sys_fields_ 添加到 fields_
+ *  3. attributes转化成FieldMeta 添加到 fields_
+ *  4. TODO: 缺失索引
+ *  5. 表名
+ *  {
+ *   "fields" :
+ *       [
+ *           {
+ *               "len" : 4,
+ *               "name" : "__trx",
+ *               "offset" : 0,
+ *               "type" : "ints",
+ *               "visible" : false
+ *           },
+ *           {
+ *               "len" : 4,
+ *               "name" : "id",
+ *               "offset" : 4,
+ *               "type" : "ints",
+ *               "visible" : true
+ *           },
+ *           {
+ *               "len" : 4,
+ *               "name" : "name",
+ *               "offset" : 8,
+ *               "type" : "chars",
+ *               "visible" : true
+ *           }
+ *       ],
+ *   "indexes" : null,
+ *   "table_name" : "t1"
+ *   }
+ * @param name 表明
+ * @param field_num 表字段数
+ * @param attributes 表字段数组
+ * @return
+ */
 RC TableMeta::init(const char *name, int field_num, const AttrInfo attributes[])
 {
   if (common::is_blank(name)) {

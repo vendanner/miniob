@@ -178,6 +178,14 @@ DiskBufferPool::~DiskBufferPool()
   LOG_INFO("Exit");
 }
 
+/**
+ * 将file第一个page 载入Frame
+ * 1. 给file 的第一个page(BP_HEADER_PAGE)，开辟一个Frame
+ * 2. 初始化 Frame的标志位
+ * 3. 将file BP_HEADER_PAGE 内容载入Frame
+ * @param file_name table data file
+ * @return
+ */
 RC DiskBufferPool::open_file(const char *file_name)
 {
   int fd;
@@ -488,6 +496,12 @@ RC DiskBufferPool::flush_all_pages()
   return RC::SUCCESS;
 }
 
+/**
+ * 给一个page 开辟一个 Frame，frame_manager_ 保存，<<file, pagenum>, Frame>
+ * @param page_num
+ * @param buffer 开辟的Frame
+ * @return
+ */
 RC DiskBufferPool::allocate_frame(PageNum page_num, Frame **buffer)
 {
   while (true) {
@@ -497,6 +511,7 @@ RC DiskBufferPool::allocate_frame(PageNum page_num, Frame **buffer)
       return RC::SUCCESS;
     }
 
+    // 若不能从frame_manager_ 分配一个Frame，那么尝试从frame_manager_ 淘汰已有的
     frame = frame_manager_.begin_purge();
     if (frame == nullptr) {
       LOG_ERROR("All pages have been used and pinned.");
@@ -573,6 +588,14 @@ BufferPoolManager::~BufferPoolManager()
   }
 }
 
+/**
+ * 1. 创建表数据文件
+ * 2. 为表数据文件创建第一个Page - BPFileHeader 并写入文件
+ *  BPFileHeader：BufferPool的文件第一个页面，存放一些元数据信息，包括了后面每页的分配信息。
+ *
+ * @param file_name 表数据文件路径
+ * @return
+ */
 RC BufferPoolManager::create_file(const char *file_name)
 {
   int fd = open(file_name, O_RDWR | O_CREAT | O_EXCL, S_IREAD | S_IWRITE);
@@ -618,6 +641,14 @@ RC BufferPoolManager::create_file(const char *file_name)
   return RC::SUCCESS;
 }
 
+/**
+ * 1. 给 data_file 关联一个 diskBufferPool
+ * 2. 将file第一个page 载入Frame
+ *
+ * @param _file_name table data file
+ * @param _bp 需要创建的bufferPool
+ * @return
+ */
 RC BufferPoolManager::open_file(const char *_file_name, DiskBufferPool *& _bp)
 {
   std::string file_name(_file_name);

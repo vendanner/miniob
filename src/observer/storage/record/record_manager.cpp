@@ -275,6 +275,11 @@ void RecordFileHandler::close()
   }
 }
 
+/**
+ * 将file 数据都载入 Frame
+ * 找到未满的Page
+ * @return
+ */
 RC RecordFileHandler::init_free_pages()
 {
   // 遍历当前文件上所有页面，找到没有满的页面

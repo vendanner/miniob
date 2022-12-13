@@ -52,6 +52,15 @@ RC Db::init(const char *name, const char *dbpath)
   return open_all_tables();
 }
 
+/**
+ * 1. 校验表名在db下是否存在
+ * 2. table->create
+ * 3. 添加新建table 到当前db下
+ * @param table_name 表名
+ * @param attribute_count   表字段数
+ * @param attributes   表字段数组
+ * @return
+ */
 RC Db::create_table(const char *table_name, int attribute_count, const AttrInfo *attributes)
 {
   RC rc = RC::SUCCESS;
@@ -71,6 +80,7 @@ RC Db::create_table(const char *table_name, int attribute_count, const AttrInfo 
     return rc;
   }
 
+  // 添加新建table 到当前db下
   opened_tables_[table_name] = table;
   LOG_INFO("Create table success. table name=%s", table_name);
   return RC::SUCCESS;

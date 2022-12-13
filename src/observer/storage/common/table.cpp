@@ -50,6 +50,17 @@ Table::~Table()
   LOG_INFO("Table has been closed: %s", name());
 }
 
+/**
+ * 1. 表元数据(字段、index、表名)-table_meta_ 写入表元信息文件
+ * 2. 创建表数据文件并写入第一个Page(BPFileHeader) - DiskBufferPool
+ * 3. 初始化 record_handler_
+ * @param path 表存放元信息的文件路径：db_path/表名.table
+ * @param name 表名
+ * @param base_dir db_path
+ * @param attribute_count 表字段数
+ * @param attributes 表字段数组
+ * @return
+ */
 RC Table::create(
     const char *path, const char *name, const char *base_dir, int attribute_count, const AttrInfo attributes[])
 {
@@ -94,10 +105,11 @@ RC Table::create(
     return RC::IOERR;
   }
 
-  // 记录元数据到文件中
+  // 一、记录元数据到文件中
   table_meta_.serialize(fs);
   fs.close();
 
+  // 二、创建表数据文件并写入第一个Page(BPFileHeader) - DiskBufferPool
   std::string data_file = table_data_file(base_dir, name);
   BufferPoolManager &bpm = BufferPoolManager::instance();
   rc = bpm.create_file(data_file.c_str());
@@ -106,6 +118,7 @@ RC Table::create(
     return rc;
   }
 
+  // 三、
   rc = init_record_handler(base_dir);
   if (rc != RC::SUCCESS) {
     LOG_ERROR("Failed to create table %s due to init record handler failed.", data_file.c_str());
@@ -340,6 +353,14 @@ RC Table::make_record(int value_num, const Value *values, char *&record_out)
   return RC::SUCCESS;
 }
 
+/**
+ * 初始化数据文件到buffer
+ * 1. 给数据文件关联一个buffer pool
+ * 2. 数据都加载到 Frame，并找到未满的Page
+ *
+ * @param base_dir db_path
+ * @return
+ */
 RC Table::init_record_handler(const char *base_dir)
 {
   std::string data_file = table_data_file(base_dir, table_meta_.name());

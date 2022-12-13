@@ -451,6 +451,14 @@ RC ExecuteStage::do_help(SQLStageEvent *sql_event)
   return RC::SUCCESS;
 }
 
+/**
+ * 创建表
+ *  - db->create_table
+ *   - table->create
+ *
+ * @param sql_event
+ * @return
+ */
 RC ExecuteStage::do_create_table(SQLStageEvent *sql_event)
 {
   const CreateTable &create_table = sql_event->query()->sstr.create_table;

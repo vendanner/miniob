@@ -168,6 +168,14 @@ void DefaultStorageStage::handle_event(StageEvent *event)
       std::string result = load_data(dbname, table_name, file_name);
       snprintf(response, sizeof(response), "%s", result.c_str());
     } break;
+    case SCF_DROP_TABLE: {
+      /**
+       * 删除表、table文件、data文件、索引文件
+       * 清空表对应的buffer pool
+       */
+
+
+    } break ;
     default:
       snprintf(response, sizeof(response), "Unsupported sql: %d\n", sql->flag);
       break;
