@@ -65,6 +65,8 @@ public:
 
   RC get_record_scanner(RecordFileScanner &scanner);
 
+  RC destroy(const char* dir);
+
   RecordFileHandler *record_handler() const
   {
     return record_handler_;

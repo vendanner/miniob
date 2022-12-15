@@ -228,6 +228,15 @@ Table *DefaultHandler::find_table(const char *dbname, const char *table_name) co
   return db->find_table(table_name);
 }
 
+RC DefaultHandler::drop_table(const char *dbname, const char *relation_name) const
+{
+  Db *db = find_db(dbname);
+  if (db == nullptr) {
+    return RC::SCHEMA_DB_NOT_EXIST;
+  }
+  return db->drop_table(relation_name);
+}
+
 RC DefaultHandler::sync()
 {
   RC rc = RC::SUCCESS;

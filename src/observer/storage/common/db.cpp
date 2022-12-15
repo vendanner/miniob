@@ -95,6 +95,29 @@ Table *Db::find_table(const char *table_name) const
   return nullptr;
 }
 
+/**
+ * 1. table 文件以及pool 清理工作
+ * 2. 删除 opened_tables_ pair
+ * @param table_name
+ * @return
+ */
+RC Db::drop_table(const char *table_name)
+{
+  auto it = opened_tables_.find(table_name);
+  if (it == opened_tables_.end()) {
+    return RC::SCHEMA_TABLE_NOT_EXIST;
+  }
+
+  Table* table = it->second;
+  RC rc = table->destroy(path_.c_str());
+  if (rc != RC::SUCCESS) return rc;
+
+  opened_tables_.erase(it);
+  delete table;
+  return RC::SUCCESS;
+
+}
+
 RC Db::open_all_tables()
 {
   std::vector<std::string> table_meta_files;

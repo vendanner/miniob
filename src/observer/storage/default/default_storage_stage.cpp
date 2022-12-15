@@ -173,8 +173,9 @@ void DefaultStorageStage::handle_event(StageEvent *event)
        * 删除表、table文件、data文件、索引文件
        * 清空表对应的buffer pool
        */
-
-
+      const char *table_name = sql->sstr.drop_table.relation_name;
+      rc = handler_->drop_table(dbname, table_name);
+      snprintf(response, sizeof(response), "%s\n", rc == RC::SUCCESS ? "SUCC" : "FAILURE");
     } break ;
     default:
       snprintf(response, sizeof(response), "Unsupported sql: %d\n", sql->flag);
